@@ -9,12 +9,18 @@
 - name: Role foolean/
   block:
 
-  - name: Ensure a web server (Apache2) is not installed (CIS)
-    become: true
-    ansible.builtin.package:
-      name:
-        - 'httpd'
-      state: absent
+    - name: Set OS variables
+      ansible.builtin.include_vars:
+        file: "{{ item }}"
+      with_first_found:
+        - "{{ ansible_os_family|lower }}.yml"
+        - "default.yml"
+
+    - name: CIS | Ensure a web server (Apache2) is not installed
+      become: true
+      ansible.builtin.package:
+        name: "{{ apache_packages }}"
+        state: absent
 
   # Tags to be applied to this role (block)
   tags:
